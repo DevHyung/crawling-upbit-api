@@ -33,11 +33,28 @@ def get_KRW_ticker():
     url = "https://api.upbit.com/v1/ticker"
     KRW_File = open("KRW_LIST.txt", 'r')
     lines = KRW_File.readlines()
+    print(">>> KRW 코인 파싱 시작 ")
     for line in lines:
         querystring = {"markets": line.strip()}
         response = requests.request("GET", url, params=querystring)
         jsonStr = json.loads(response.text)
         sheet1.append([line.strip(),jsonStr[0]['trade_price'],round(jsonStr[0]['signed_change_rate']*100,2),round(jsonStr[0]['acc_trade_price_24h'])])
+    print(">>> KRW 코인 파싱 끝 ")
+def get_BTC_ticker():
+    sheet2.append(excelHeader)
+
+    url = "https://api.upbit.com/v1/ticker"
+    BTC_File = open("BTC_LIST.txt", 'r')
+    lines = BTC_File.readlines()
+    print(">>> BTC 코인 파싱 시작 ")
+    for line in lines:
+        querystring = {"markets": line.strip()}
+        response = requests.request("GET", url, params=querystring)
+        jsonStr = json.loads(response.text)
+        sheet2.append([line.strip(), jsonStr[0]['trade_price'], round(jsonStr[0]['signed_change_rate'] * 100, 2),
+                       round(jsonStr[0]['acc_trade_price_24h'])])
+    print(">>> BTC 코인 파싱 끝 ")
+
 if __name__ == "__main__":
     book = Workbook()
     # 시트 설정
@@ -48,8 +65,14 @@ if __name__ == "__main__":
     sheet1.column_dimensions['D'].width = 20
     sheet1.title = 'KRW'
 
+    sheet2 = book.create_sheet(title="BTC")
+    sheet2.column_dimensions['A'].width = 10
+    sheet2.column_dimensions['B'].width = 20
+    sheet2.column_dimensions['C'].width = 20
+    sheet2.column_dimensions['D'].width = 20
+
     # 코인파싱
     get_KRW_ticker()
-
+    get_BTC_ticker()
     #
     book.save(FILENAME)
