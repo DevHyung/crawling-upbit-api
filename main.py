@@ -1,11 +1,12 @@
 import requests
 import json
+import time
 from openpyxl import Workbook
-import os
 #===    GLOBAL
 excelHeader = ['코인명','현재가','전일대비','거래대금']
 FILENAME = 'coin.xlsx'
 def get_symbol_list():
+    print(">>> 코인 심볼 받아오기 시작 ")
     KRW_File = open("KRW_LIST.txt",'w')
     BTC_File = open("BTC_LIST.txt",'w')
     ETH_File = open("ETH_LIST.txt",'w')
@@ -14,7 +15,6 @@ def get_symbol_list():
     response = requests.request("GET", url)
     jsonStr = json.loads(response.text)
     for coin in jsonStr:
-        print(coin['market'])
         if 'BTC-' in coin['market']:
             BTC_File.write(coin['market']+'\n')
         elif 'KRW-' in coin['market']:
@@ -27,6 +27,7 @@ def get_symbol_list():
     BTC_File.close()
     ETH_File.close()
     USDT_File.close()
+    print(">>> 코인 심볼 받아오기 끝 ")
 def get_KRW_ticker():
     sheet1.append(excelHeader)
 
@@ -82,7 +83,22 @@ def get_USDT_ticker():
                        round(jsonStr[0]['acc_trade_price_24h'])])
     print(">>> USDT 코인 파싱 끝 ")
 
+def valid_user():
+    # 20180730 01:51기준 20시간
+    #print(time.time())
+    now = 1532883076.1796951
+    terminTime = now + 60 * 60 * 20
+    print("체험판 만료기간 : ", time.ctime(terminTime))
+    if time.time() > terminTime:
+        print('만료되었습니다.')
+        exit(-1)
+    else:
+        print(">>> 프로그램이 실행되었습니다.")
+
+
 if __name__ == "__main__":
+    valid_user()
+
     book = Workbook()
     # 시트 설정
     sheet1 = book.active
@@ -110,6 +126,7 @@ if __name__ == "__main__":
     sheet4.column_dimensions['C'].width = 20
     sheet4.column_dimensions['D'].width = 20
     # 코인파싱
+    get_symbol_list()
     get_KRW_ticker()
     get_BTC_ticker()
     get_ETH_ticker()
