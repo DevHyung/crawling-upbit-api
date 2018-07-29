@@ -55,6 +55,33 @@ def get_BTC_ticker():
                        round(jsonStr[0]['acc_trade_price_24h'])])
     print(">>> BTC 코인 파싱 끝 ")
 
+def get_ETH_ticker():
+    sheet3.append(excelHeader)
+    url = "https://api.upbit.com/v1/ticker"
+    ETH_File = open("ETH_LIST.txt", 'r')
+    lines = ETH_File.readlines()
+    print(">>> ETH 코인 파싱 시작 ")
+    for line in lines:
+        querystring = {"markets": line.strip()}
+        response = requests.request("GET", url, params=querystring)
+        jsonStr = json.loads(response.text)
+        sheet3.append([line.strip(), jsonStr[0]['trade_price'], round(jsonStr[0]['signed_change_rate'] * 100, 2),
+                       round(jsonStr[0]['acc_trade_price_24h'])])
+    print(">>> ETH 코인 파싱 끝 ")
+def get_USDT_ticker():
+    sheet4.append(excelHeader)
+    url = "https://api.upbit.com/v1/ticker"
+    USDT_File = open("USDT_LIST.txt", 'r')
+    lines = USDT_File.readlines()
+    print(">>> USDT 코인 파싱 시작 ")
+    for line in lines:
+        querystring = {"markets": line.strip()}
+        response = requests.request("GET", url, params=querystring)
+        jsonStr = json.loads(response.text)
+        sheet4.append([line.strip(), jsonStr[0]['trade_price'], round(jsonStr[0]['signed_change_rate'] * 100, 2),
+                       round(jsonStr[0]['acc_trade_price_24h'])])
+    print(">>> USDT 코인 파싱 끝 ")
+
 if __name__ == "__main__":
     book = Workbook()
     # 시트 설정
@@ -71,8 +98,21 @@ if __name__ == "__main__":
     sheet2.column_dimensions['C'].width = 20
     sheet2.column_dimensions['D'].width = 20
 
+    sheet3 = book.create_sheet(title="ETH")
+    sheet3.column_dimensions['A'].width = 10
+    sheet3.column_dimensions['B'].width = 20
+    sheet3.column_dimensions['C'].width = 20
+    sheet3.column_dimensions['D'].width = 20
+
+    sheet4 = book.create_sheet(title="USDT")
+    sheet4.column_dimensions['A'].width = 10
+    sheet4.column_dimensions['B'].width = 20
+    sheet4.column_dimensions['C'].width = 20
+    sheet4.column_dimensions['D'].width = 20
     # 코인파싱
     get_KRW_ticker()
     get_BTC_ticker()
+    get_ETH_ticker()
+    get_USDT_ticker()
     #
     book.save(FILENAME)
